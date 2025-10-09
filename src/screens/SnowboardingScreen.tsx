@@ -67,7 +67,10 @@ const SnowboardingScreen: React.FC = () => {
     }
   };
 
-  const formatDistance = (meters: number): string => {
+  const formatDistance = (meters: number | undefined): string => {
+    if (meters === undefined || meters === null || isNaN(meters)) {
+      return '0 m';
+    }
     if (meters >= 1000) {
       return `${(meters / 1000).toFixed(2)} km`;
     } else {
@@ -99,11 +102,11 @@ const SnowboardingScreen: React.FC = () => {
         </View>
         <View style={styles.statItem}>
           <Ionicons name="time" size={16} color="#007AFF" />
-          <Text style={styles.statValue}>{formatDuration(item.duration)}</Text>
+          <Text style={styles.statValue}>{formatDuration(item.duration || 0)}</Text>
         </View>
         <View style={styles.statItem}>
           <Ionicons name="snow" size={16} color="#00D4AA" />
-          <Text style={styles.statValue}>{item.numberOfRuns} runs</Text>
+          <Text style={styles.statValue}>{item.numberOfRuns || 0} runs</Text>
         </View>
         <View style={styles.statItem}>
           <Ionicons name="trending-up" size={16} color="#9C27B0" />
@@ -112,7 +115,7 @@ const SnowboardingScreen: React.FC = () => {
         <View style={styles.statItem}>
           <Ionicons name="speedometer" size={16} color="#FF6B35" />
           <Text style={styles.statValue}>
-            {(item.maxSpeed * 3.6).toFixed(1)} km/h
+            {((item.maxSpeed || 0) * 3.6).toFixed(1)} km/h
           </Text>
         </View>
       </View>

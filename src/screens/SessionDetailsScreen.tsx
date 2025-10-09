@@ -93,7 +93,10 @@ const SessionDetailsScreen: React.FC = () => {
     }
   };
 
-  const formatDuration = (seconds: number): string => {
+  const formatDuration = (seconds: number | undefined): string => {
+    if (seconds === undefined || seconds === null || isNaN(seconds)) {
+      return '0s';
+    }
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const remainingSeconds = seconds % 60;
@@ -107,7 +110,10 @@ const SessionDetailsScreen: React.FC = () => {
     }
   };
 
-  const formatDistance = (meters: number): string => {
+  const formatDistance = (meters: number | undefined): string => {
+    if (meters === undefined || meters === null || isNaN(meters)) {
+      return '0 m';
+    }
     if (meters >= 1000) {
       return `${(meters / 1000).toFixed(2)} km`;
     } else {
@@ -115,11 +121,17 @@ const SessionDetailsScreen: React.FC = () => {
     }
   };
 
-  const formatSpeed = (mps: number): string => {
+  const formatSpeed = (mps: number | undefined): string => {
+    if (mps === undefined || mps === null || isNaN(mps)) {
+      return '0.0 km/h';
+    }
     return `${(mps * 3.6).toFixed(1)} km/h`;
   };
 
-  const formatElevation = (meters: number): string => {
+  const formatElevation = (meters: number | undefined): string => {
+    if (meters === undefined || meters === null || isNaN(meters)) {
+      return '0 m';
+    }
     return `${meters.toFixed(0)} m`;
   };
 
@@ -172,7 +184,7 @@ const SessionDetailsScreen: React.FC = () => {
   }
 
   const mapRegion = getMapRegion(session.route);
-  const heatMapSegments = createHeatMapSegments(session.route, session.maxSpeed);
+  const heatMapSegments = createHeatMapSegments(session.route, session.maxSpeed || 0);
 
   return (
     <ScrollView style={styles.container}>
@@ -185,7 +197,7 @@ const SessionDetailsScreen: React.FC = () => {
           <Ionicons name="map" size={48} color="white" />
           <Text style={styles.routeTitle}>Route Tracked</Text>
           <Text style={styles.routeSubtitle}>
-            {session.route.length} GPS points recorded
+            {session.route?.length || 0} GPS points recorded
           </Text>
           <TouchableOpacity style={styles.viewMapButton}>
             <Ionicons name="location" size={16} color="#007AFF" />
@@ -240,7 +252,7 @@ const SessionDetailsScreen: React.FC = () => {
           
           <View style={styles.statCard}>
             <Ionicons name="snow" size={24} color="#00D4AA" />
-            <Text style={styles.statValue}>{session.numberOfRuns}</Text>
+            <Text style={styles.statValue}>{session.numberOfRuns || 0}</Text>
             <Text style={styles.statLabel}>Runs</Text>
           </View>
           
