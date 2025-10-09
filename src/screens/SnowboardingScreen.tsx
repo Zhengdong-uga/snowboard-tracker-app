@@ -102,7 +102,15 @@ const SnowboardingScreen: React.FC = () => {
           <Text style={styles.statValue}>{formatDuration(item.duration)}</Text>
         </View>
         <View style={styles.statItem}>
-          <Ionicons name="speedometer" size={16} color="#007AFF" />
+          <Ionicons name="snow" size={16} color="#00D4AA" />
+          <Text style={styles.statValue}>{item.numberOfRuns} runs</Text>
+        </View>
+        <View style={styles.statItem}>
+          <Ionicons name="trending-up" size={16} color="#9C27B0" />
+          <Text style={styles.statValue}>{formatDistance(item.vertical)}</Text>
+        </View>
+        <View style={styles.statItem}>
+          <Ionicons name="speedometer" size={16} color="#FF6B35" />
           <Text style={styles.statValue}>
             {(item.maxSpeed * 3.6).toFixed(1)} km/h
           </Text>
@@ -206,12 +214,15 @@ const styles = StyleSheet.create({
   },
   sessionStats: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
+    gap: 8,
   },
   statItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    minWidth: '30%',
+    marginBottom: 4,
   },
   statValue: {
     color: '#ccc',

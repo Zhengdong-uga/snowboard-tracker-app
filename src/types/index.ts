@@ -15,6 +15,11 @@ export interface SnowboardSession {
   averageSpeed: number; // in m/s
   elevationGain: number; // in meters
   elevationLoss: number; // in meters
+  vertical: number; // total vertical distance (elevationGain + elevationLoss) in meters
+  numberOfRuns: number; // number of downhill runs detected
+  maxAltitude: number; // highest point reached in meters
+  minAltitude: number; // lowest point reached in meters
+  currentAltitude: number; // current altitude in meters
   route: LocationPoint[];
   status: 'completed' | 'active' | 'paused';
 }
@@ -24,8 +29,25 @@ export interface LiveStats {
   duration: number;
   currentSpeed: number;
   averageSpeed: number;
+  maxSpeed: number; // top speed reached so far
   elevationGain: number;
   elevationLoss: number;
+  vertical: number; // total vertical distance
+  numberOfRuns: number;
+  currentAltitude: number;
+  maxAltitude: number;
+  minAltitude: number;
+}
+
+export interface Run {
+  startTime: number;
+  endTime: number;
+  startAltitude: number;
+  endAltitude: number;
+  verticalDrop: number;
+  maxSpeed: number;
+  avgSpeed: number;
+  distance: number;
 }
 
 export interface MapRegion {

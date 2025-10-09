@@ -227,9 +227,9 @@ const SessionDetailsScreen: React.FC = () => {
           </View>
           
           <View style={styles.statCard}>
-            <Ionicons name="speedometer" size={24} color="#007AFF" />
+            <Ionicons name="speedometer" size={24} color="#FF6B35" />
             <Text style={styles.statValue}>{formatSpeed(session.maxSpeed)}</Text>
-            <Text style={styles.statLabel}>Max Speed</Text>
+            <Text style={styles.statLabel}>Top Speed</Text>
           </View>
           
           <View style={styles.statCard}>
@@ -239,15 +239,27 @@ const SessionDetailsScreen: React.FC = () => {
           </View>
           
           <View style={styles.statCard}>
-            <Ionicons name="arrow-up" size={24} color="#4CAF50" />
-            <Text style={styles.statValue}>{formatElevation(session.elevationGain)}</Text>
-            <Text style={styles.statLabel}>Elevation Gain</Text>
+            <Ionicons name="snow" size={24} color="#00D4AA" />
+            <Text style={styles.statValue}>{session.numberOfRuns}</Text>
+            <Text style={styles.statLabel}>Runs</Text>
           </View>
           
           <View style={styles.statCard}>
-            <Ionicons name="arrow-down" size={24} color="#F44336" />
-            <Text style={styles.statValue}>{formatElevation(session.elevationLoss)}</Text>
-            <Text style={styles.statLabel}>Elevation Loss</Text>
+            <Ionicons name="trending-up" size={24} color="#9C27B0" />
+            <Text style={styles.statValue}>{formatElevation(session.vertical)}</Text>
+            <Text style={styles.statLabel}>Vertical</Text>
+          </View>
+          
+          <View style={styles.statCard}>
+            <Ionicons name="mountain" size={24} color="#4CAF50" />
+            <Text style={styles.statValue}>{formatElevation(session.maxAltitude)}</Text>
+            <Text style={styles.statLabel}>Max Altitude</Text>
+          </View>
+          
+          <View style={styles.statCard}>
+            <Ionicons name="arrow-up" size={24} color="#4CAF50" />
+            <Text style={styles.statValue}>{formatElevation(session.elevationGain)}</Text>
+            <Text style={styles.statLabel}>Elevation ↑</Text>
           </View>
         </View>
       </View>

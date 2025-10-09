@@ -26,8 +26,14 @@ const LiveTrackingScreen: React.FC = () => {
     duration: 0,
     currentSpeed: 0,
     averageSpeed: 0,
+    maxSpeed: 0,
     elevationGain: 0,
     elevationLoss: 0,
+    vertical: 0,
+    numberOfRuns: 0,
+    currentAltitude: 0,
+    maxAltitude: 0,
+    minAltitude: 0,
   });
 
   const locationService = useRef(new LocationTrackingService());
@@ -125,10 +131,15 @@ const LiveTrackingScreen: React.FC = () => {
         date: new Date(),
         duration: totalDuration,
         distance: stats.distance,
-        maxSpeed,
+        maxSpeed: stats.maxSpeed,
         averageSpeed: stats.averageSpeed,
         elevationGain: stats.elevationGain,
         elevationLoss: stats.elevationLoss,
+        vertical: stats.vertical,
+        numberOfRuns: stats.numberOfRuns,
+        maxAltitude: stats.maxAltitude,
+        minAltitude: stats.minAltitude,
+        currentAltitude: stats.currentAltitude,
         route,
         status: 'completed',
       };
@@ -230,22 +241,60 @@ const LiveTrackingScreen: React.FC = () => {
           </View>
         </View>
 
+        {/* Speed Stats */}
         <View style={styles.secondaryStats}>
-          <View style={styles.statItem}>
-            <Text style={styles.statTitle}>Current Speed</Text>
-            <Text style={styles.statData}>{formatSpeed(stats.currentSpeed)}</Text>
+          <Text style={styles.sectionTitle}>Speed</Text>
+          <View style={styles.statRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statTitle}>Current</Text>
+              <Text style={styles.statData}>{formatSpeed(stats.currentSpeed)}</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statTitle}>Top Speed</Text>
+              <Text style={styles.statData}>{formatSpeed(stats.maxSpeed)}</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statTitle}>Average</Text>
+              <Text style={styles.statData}>{formatSpeed(stats.averageSpeed)}</Text>
+            </View>
           </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statTitle}>Average Speed</Text>
-            <Text style={styles.statData}>{formatSpeed(stats.averageSpeed)}</Text>
+        </View>
+
+        {/* Altitude Stats */}
+        <View style={styles.secondaryStats}>
+          <Text style={styles.sectionTitle}>Altitude</Text>
+          <View style={styles.statRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statTitle}>Current</Text>
+              <Text style={styles.statData}>{formatElevation(stats.currentAltitude)}</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statTitle}>Max</Text>
+              <Text style={styles.statData}>{formatElevation(stats.maxAltitude)}</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statTitle}>Min</Text>
+              <Text style={styles.statData}>{formatElevation(stats.minAltitude)}</Text>
+            </View>
           </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statTitle}>Elevation Gain</Text>
-            <Text style={styles.statData}>{formatElevation(stats.elevationGain)}</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statTitle}>Elevation Loss</Text>
-            <Text style={styles.statData}>{formatElevation(stats.elevationLoss)}</Text>
+        </View>
+
+        {/* Vertical & Runs Stats */}
+        <View style={styles.secondaryStats}>
+          <Text style={styles.sectionTitle}>Performance</Text>
+          <View style={styles.statRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statTitle}>Vertical</Text>
+              <Text style={styles.statData}>{formatElevation(stats.vertical)}</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statTitle}>Runs</Text>
+              <Text style={styles.statData}>{stats.numberOfRuns}</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statTitle}>Elev ↑</Text>
+              <Text style={styles.statData}>{formatElevation(stats.elevationGain)}</Text>
+            </View>
           </View>
         </View>
       </View>
@@ -335,19 +384,28 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 16,
     padding: 20,
+    marginBottom: 16,
   },
-  statItem: {
+  sectionTitle: {
+    color: '#007AFF',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  statRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  statItem: {
     alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+    flex: 1,
   },
   statTitle: {
     color: '#ccc',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '500',
+    marginBottom: 4,
   },
   statData: {
     color: '#fff',

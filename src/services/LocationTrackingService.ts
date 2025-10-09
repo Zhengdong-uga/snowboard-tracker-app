@@ -1,12 +1,16 @@
 import * as Location from 'expo-location';
-import { LocationPoint, LiveStats } from '../types';
+import { LocationPoint, LiveStats, Run } from '../types';
 
 export class LocationTrackingService {
   private watchId: Location.LocationSubscription | null = null;
   private route: LocationPoint[] = [];
+  private runs: Run[] = [];
   private startTime: number = 0;
   private onStatsUpdate: ((stats: LiveStats) => void) | null = null;
   private isTracking: boolean = false;
+  private currentRunStartIndex: number = -1;
+  private isGoingDownhill: boolean = false;
+  private maxSpeedReached: number = 0;
 
   async requestPermissions(): Promise<boolean> {
     try {
@@ -58,9 +62,13 @@ export class LocationTrackingService {
 
     try {
       this.route = [];
+      this.runs = [];
       this.startTime = Date.now();
       this.onStatsUpdate = onStatsUpdate;
       this.isTracking = true;
+      this.currentRunStartIndex = -1;
+      this.isGoingDownhill = false;
+      this.maxSpeedReached = 0;
 
       this.watchId = await Location.watchPositionAsync(
         {
@@ -87,11 +95,16 @@ export class LocationTrackingService {
       this.watchId = null;
     }
 
+    // Finish any ongoing run
+    this.finishCurrentRun();
+
     this.isTracking = false;
     this.onStatsUpdate = null;
 
     const finalRoute = [...this.route];
     this.route = [];
+    this.runs = [];
+    this.maxSpeedReached = 0;
     return finalRoute;
   }
 
@@ -106,6 +119,14 @@ export class LocationTrackingService {
 
     this.route.push(point);
 
+    // Update max speed
+    if (point.speed && point.speed > this.maxSpeedReached) {
+      this.maxSpeedReached = point.speed;
+    }
+
+    // Detect runs (downhill segments)
+    this.detectRuns(point);
+
     if (this.onStatsUpdate) {
       const stats = this.calculateLiveStats();
       this.onStatsUpdate(stats);
@@ -119,8 +140,14 @@ export class LocationTrackingService {
         duration: 0,
         currentSpeed: 0,
         averageSpeed: 0,
+        maxSpeed: 0,
         elevationGain: 0,
         elevationLoss: 0,
+        vertical: 0,
+        numberOfRuns: 0,
+        currentAltitude: 0,
+        maxAltitude: 0,
+        minAltitude: 0,
       };
     }
 
@@ -130,14 +157,22 @@ export class LocationTrackingService {
     const currentSpeed = this.getCurrentSpeed();
     const averageSpeed = duration > 0 ? distance / duration : 0;
     const { elevationGain, elevationLoss } = this.calculateElevationChange();
+    const { currentAltitude, maxAltitude, minAltitude } = this.calculateAltitudeStats();
+    const vertical = elevationGain + elevationLoss;
 
     return {
       distance,
       duration,
       currentSpeed,
       averageSpeed,
+      maxSpeed: this.maxSpeedReached,
       elevationGain,
       elevationLoss,
+      vertical,
+      numberOfRuns: this.runs.length,
+      currentAltitude,
+      maxAltitude,
+      minAltitude,
     };
   }
 
@@ -201,5 +236,115 @@ export class LocationTrackingService {
 
   getCurrentRoute(): LocationPoint[] {
     return [...this.route];
+  }
+
+  private calculateAltitudeStats(): { currentAltitude: number; maxAltitude: number; minAltitude: number } {
+    if (this.route.length === 0) {
+      return { currentAltitude: 0, maxAltitude: 0, minAltitude: 0 };
+    }
+
+    const altitudes = this.route
+      .map(point => point.altitude)
+      .filter((alt): alt is number => alt !== undefined);
+
+    if (altitudes.length === 0) {
+      return { currentAltitude: 0, maxAltitude: 0, minAltitude: 0 };
+    }
+
+    const currentPoint = this.route[this.route.length - 1];
+    const currentAltitude = currentPoint.altitude || 0;
+    const maxAltitude = Math.max(...altitudes);
+    const minAltitude = Math.min(...altitudes);
+
+    return { currentAltitude, maxAltitude, minAltitude };
+  }
+
+  private detectRuns(currentPoint: LocationPoint): void {
+    if (this.route.length < 3 || !currentPoint.altitude) return;
+
+    const previousPoint = this.route[this.route.length - 2];
+    if (!previousPoint.altitude) return;
+
+    const elevationChange = currentPoint.altitude - previousPoint.altitude;
+    const isCurrentlyGoingDownhill = elevationChange < -2; // At least 2m drop to be considered downhill
+    const isCurrentlyGoingUphill = elevationChange > 5; // At least 5m gain to end a run
+
+    // Start a new run if going downhill and not already in a run
+    if (isCurrentlyGoingDownhill && !this.isGoingDownhill) {
+      this.startNewRun();
+      this.isGoingDownhill = true;
+    }
+    // End current run if going uphill significantly or stopped moving downhill for a while
+    else if (this.isGoingDownhill && (isCurrentlyGoingUphill || this.shouldEndCurrentRun())) {
+      this.finishCurrentRun();
+      this.isGoingDownhill = false;
+    }
+  }
+
+  private startNewRun(): void {
+    this.currentRunStartIndex = this.route.length - 1;
+  }
+
+  private shouldEndCurrentRun(): boolean {
+    if (this.currentRunStartIndex === -1) return false;
+    
+    // End run if we've been going uphill or flat for more than 30 seconds
+    const runDuration = this.route.length - this.currentRunStartIndex;
+    return runDuration > 30; // Assuming 1 point per second
+  }
+
+  private finishCurrentRun(): void {
+    if (this.currentRunStartIndex === -1 || this.route.length === 0) return;
+
+    const startPoint = this.route[this.currentRunStartIndex];
+    const endPoint = this.route[this.route.length - 1];
+
+    if (!startPoint.altitude || !endPoint.altitude) return;
+
+    const runPoints = this.route.slice(this.currentRunStartIndex);
+    const verticalDrop = startPoint.altitude - endPoint.altitude;
+
+    // Only count as a run if there's significant vertical drop (at least 10m)
+    if (verticalDrop > 10) {
+      const runDistance = this.calculateRunDistance(runPoints);
+      const maxRunSpeed = this.getMaxSpeedInRun(runPoints);
+      const avgRunSpeed = this.getAverageSpeedInRun(runPoints);
+
+      const run: Run = {
+        startTime: startPoint.timestamp,
+        endTime: endPoint.timestamp,
+        startAltitude: startPoint.altitude,
+        endAltitude: endPoint.altitude,
+        verticalDrop,
+        maxSpeed: maxRunSpeed,
+        avgSpeed: avgRunSpeed,
+        distance: runDistance,
+      };
+
+      this.runs.push(run);
+    }
+
+    this.currentRunStartIndex = -1;
+  }
+
+  private calculateRunDistance(runPoints: LocationPoint[]): number {
+    let distance = 0;
+    for (let i = 1; i < runPoints.length; i++) {
+      distance += this.calculateDistance(runPoints[i - 1], runPoints[i]);
+    }
+    return distance;
+  }
+
+  private getMaxSpeedInRun(runPoints: LocationPoint[]): number {
+    return Math.max(...runPoints.map(point => point.speed || 0));
+  }
+
+  private getAverageSpeedInRun(runPoints: LocationPoint[]): number {
+    const speeds = runPoints.map(point => point.speed || 0).filter(speed => speed > 0);
+    return speeds.length > 0 ? speeds.reduce((sum, speed) => sum + speed, 0) / speeds.length : 0;
+  }
+
+  getRuns(): Run[] {
+    return [...this.runs];
   }
 }
