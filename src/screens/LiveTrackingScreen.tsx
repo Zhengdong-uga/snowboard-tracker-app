@@ -59,21 +59,33 @@ const LiveTrackingScreen: React.FC = () => {
 
   const startTracking = async () => {
     try {
+      console.log('Starting location tracking...');
       const success = await locationService.current.startTracking(handleStatsUpdate);
       if (success) {
+        console.log('Location tracking started successfully');
         setIsTracking(true);
         setIsPaused(false);
       } else {
+        console.log('Location tracking failed - showing permission alert');
         Alert.alert(
           'Location Permission Required',
-          'Please enable location permissions to track your snowboarding session.',
-          [{ text: 'OK', onPress: () => navigation.goBack() }]
+          'Please enable location permissions in your device settings to track your snowboarding session.\n\nGo to Settings > Privacy & Security > Location Services and enable location for Expo Go.',
+          [
+            { text: 'Cancel', onPress: () => navigation.goBack(), style: 'cancel' },
+            { text: 'Try Again', onPress: startTracking }
+          ]
         );
       }
     } catch (error) {
       console.error('Error starting tracking:', error);
-      Alert.alert('Error', 'Failed to start tracking');
-      navigation.goBack();
+      Alert.alert(
+        'Error Starting Tracking', 
+        `Failed to start location tracking: ${error.message || 'Unknown error'}`,
+        [
+          { text: 'Cancel', onPress: () => navigation.goBack(), style: 'cancel' },
+          { text: 'Try Again', onPress: startTracking }
+        ]
+      );
     }
   };
 

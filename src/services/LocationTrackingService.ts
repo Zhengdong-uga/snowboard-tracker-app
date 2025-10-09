@@ -10,16 +10,32 @@ export class LocationTrackingService {
 
   async requestPermissions(): Promise<boolean> {
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
+      // First check if we already have permission
+      let { status } = await Location.getForegroundPermissionsAsync();
+      
       if (status !== 'granted') {
-        console.error('Location permission not granted');
+        console.log('Requesting foreground location permissions...');
+        const result = await Location.requestForegroundPermissionsAsync();
+        status = result.status;
+      }
+      
+      if (status !== 'granted') {
+        console.error('Location permission not granted:', status);
         return false;
       }
 
-      // Request background permission for active tracking
-      const backgroundStatus = await Location.requestBackgroundPermissionsAsync();
-      if (backgroundStatus.status !== 'granted') {
-        console.warn('Background location permission not granted');
+      console.log('Foreground location permission granted');
+      
+      // Try to request background permission but don't fail if it's not granted
+      try {
+        const backgroundStatus = await Location.requestBackgroundPermissionsAsync();
+        if (backgroundStatus.status === 'granted') {
+          console.log('Background location permission granted');
+        } else {
+          console.warn('Background location permission not granted, but app will still work');
+        }
+      } catch (bgError) {
+        console.warn('Background permission request failed, continuing with foreground only:', bgError);
       }
 
       return true;
