@@ -12,6 +12,7 @@ const AppNavigator: React.FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
+        id={undefined}
         initialRouteName="Main"
         screenOptions={{
           headerStyle: {

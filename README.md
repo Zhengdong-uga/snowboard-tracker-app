@@ -1,88 +1,80 @@
 # Snowboard Tracker App
 
-A React Native mobile application for tracking snowboarding sessions, recording statistics, and analyzing performance on the slopes.
+A cross‑platform React Native app (Expo) for tracking snowboarding sessions with live GPS, rich stats, and a clean, Nike Run–inspired UI.
+
+## What’s new (this update)
+- Redesigned Snowboarding tab with Nike Run–style layout: quick stats, actions row, and a large “LET’S DO IT” CTA.
+- Live GPS follow on map with user marker when running a Development Build.
+- Live Tracking screen improved: robust error handling, better altitude logic, and session save flow.
+- Fixed multiple TypeScript/runtime issues and added @expo/vector-icons and gesture-handler.
 
 ## Features
+- 📍 Live GPS tracking of snowboarding runs
+- 📊 Session stats: distance, duration, current/avg/max speed, elevation gain/loss, vertical, runs
+- 🏔️ Per‑session route saved locally for details view
+- 📱 iOS and Android via Expo
 
-- 📍 GPS tracking of snowboarding runs
-- 📊 Session statistics (distance, speed, elevation, duration)
-- 🏔️ Resort and slope tracking
-- 📱 Cross-platform (iOS and Android)
-- 🎯 Personal performance analytics
-- 📈 Progress tracking over time
+## Screens
+- Snowboarding (Start): map preview, quick stats from last session, Settings/Open Goal row, big start CTA
+- Live Tracking: real‑time stats, pause/resume, stop and save
+- Session Details: summary and route info (visualization placeholder)
 
 ## Tech Stack
-
-- **React Native** with Expo
-- **TypeScript** for type safety
-- **React Navigation** for navigation
-- **GPS/Location Services** for tracking
-- **AsyncStorage** for local data persistence
+- Expo (React Native 0.81 / Expo SDK 54)
+- TypeScript
+- React Navigation
+- expo-location, expo-maps, AsyncStorage
 
 ## Getting Started
+### Install
+```bash
+npm install
+```
 
-### Prerequisites
+### Run (Expo Go)
+```bash
+npm start
+```
+Note: Expo Go cannot load native expo-maps. The Snowboarding tab shows a safe placeholder.
 
-- Node.js (v18 or later)
-- npm or yarn
-- Expo CLI
-- iOS Simulator (for iOS development)
-- Android Studio/Emulator (for Android development)
+### Full map (Development Build)
+To enable the live Apple/Google Maps view:
+```bash
+npx expo install expo-dev-client
+# iOS	npx expo run:ios
+# Android	npx expo run:android
+# then
+expo start --dev-client
+```
 
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd snowboard-tracker-app
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start the development server:
-   ```bash
-   npm start
-   ```
-
-4. Run on specific platforms:
-   ```bash
-   npm run ios     # iOS Simulator
-   npm run android # Android Emulator
-   npm run web     # Web browser
-   ```
+### Platform shortcuts
+```bash
+npm run ios
+npm run android
+npm run web
+```
 
 ## Project Structure
-
 ```
 src/
-├── components/     # Reusable UI components
-├── screens/        # Screen components
-├── services/       # API services and external integrations
-├── utils/          # Utility functions
-├── types/          # TypeScript type definitions
-├── hooks/          # Custom React hooks
-└── navigation/     # Navigation configuration
+├── components/
+├── screens/
+├── services/
+├── utils/
+├── types/
+└── navigation/
 ```
 
-## Development
-
-This project uses Expo for React Native development, which provides:
-- Fast development workflow
-- Easy testing on physical devices
-- Built-in components and APIs
-- Simplified build and deployment process
+## Roadmap
+- Background tracking and auto‑pause
+- Route map on Session Details with speed heatmap
+- Goals/workouts and gear management
+- Sync/export sessions
 
 ## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+1. Create a feature branch from main
+2. Make changes and add tests if applicable
+3. Open a PR with a clear description and screenshots
 
 ## License
-
-This project is licensed under the MIT License.
+MIT

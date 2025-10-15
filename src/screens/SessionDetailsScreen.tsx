@@ -152,7 +152,7 @@ const SessionDetailsScreen: React.FC = () => {
     for (let i = 1; i < route.length; i++) {
       const start = route[i - 1];
       const end = route[i];
-      const speed = (start.speed || 0 + end.speed || 0) / 2; // Average speed for segment
+      const speed = ((start.speed || 0) + (end.speed || 0)) / 2; // Average speed for segment
       
       segments.push({
         coordinates: [
@@ -263,7 +263,7 @@ const SessionDetailsScreen: React.FC = () => {
           </View>
           
           <View style={styles.statCard}>
-            <Ionicons name="mountain" size={24} color="#4CAF50" />
+            <Ionicons name="arrow-up-circle" size={24} color="#4CAF50" />
             <Text style={styles.statValue}>{formatElevation(session.maxAltitude)}</Text>
             <Text style={styles.statLabel}>Max Altitude</Text>
           </View>

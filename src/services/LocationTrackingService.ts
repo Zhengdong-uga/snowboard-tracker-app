@@ -260,10 +260,10 @@ export class LocationTrackingService {
   }
 
   private detectRuns(currentPoint: LocationPoint): void {
-    if (this.route.length < 3 || !currentPoint.altitude) return;
+    if (this.route.length < 3 || currentPoint.altitude === undefined) return;
 
     const previousPoint = this.route[this.route.length - 2];
-    if (!previousPoint.altitude) return;
+    if (previousPoint.altitude === undefined) return;
 
     const elevationChange = currentPoint.altitude - previousPoint.altitude;
     const isCurrentlyGoingDownhill = elevationChange < -2; // At least 2m drop to be considered downhill
@@ -299,7 +299,7 @@ export class LocationTrackingService {
     const startPoint = this.route[this.currentRunStartIndex];
     const endPoint = this.route[this.route.length - 1];
 
-    if (!startPoint.altitude || !endPoint.altitude) return;
+    if (startPoint.altitude === undefined || endPoint.altitude === undefined) return;
 
     const runPoints = this.route.slice(this.currentRunStartIndex);
     const verticalDrop = startPoint.altitude - endPoint.altitude;

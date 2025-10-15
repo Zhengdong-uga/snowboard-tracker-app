@@ -82,11 +82,11 @@ const LiveTrackingScreen: React.FC = () => {
           ]
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error starting tracking:', error);
       Alert.alert(
         'Error Starting Tracking', 
-        `Failed to start location tracking: ${error.message || 'Unknown error'}`,
+        `Failed to start location tracking: ${error?.message || 'Unknown error'}`,
         [
           { text: 'Cancel', onPress: () => navigation.goBack(), style: 'cancel' },
           { text: 'Try Again', onPress: startTracking }
@@ -163,9 +163,9 @@ const LiveTrackingScreen: React.FC = () => {
           },
         ]
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving session:', error);
-      Alert.alert('Error', 'Failed to save session');
+      Alert.alert('Error', `Failed to save session: ${error?.message || 'Unknown error'}`);
       navigation.goBack();
     }
   };

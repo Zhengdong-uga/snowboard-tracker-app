@@ -64,6 +64,7 @@ export type RootStackParamList = {
 };
 
 export type MainTabParamList = {
+  Statistics: undefined;
   Snowboarding: undefined;
-  Profile: undefined;
+  Gears: undefined;
 };
