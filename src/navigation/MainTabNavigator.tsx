@@ -1,12 +1,12 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { MainTabParamList } from '../types';
 import SnowboardingScreen from '../screens/SnowboardingScreen';
 import StatisticsScreen from '../screens/StatisticsScreen';
 import GearsScreen from '../screens/GearsScreen';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { StyleSheet } from 'react-native';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
@@ -37,9 +37,7 @@ const MainTabNavigator: React.FC = () => {
         tabBarBackground: () => (
           <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
         ),
-        headerStyle: { backgroundColor: '#000' },
-        headerTintColor: '#fff',
-        headerTitleStyle: { fontWeight: 'bold' },
+        headerShown: false,
       })}
     >
       <Tab.Screen

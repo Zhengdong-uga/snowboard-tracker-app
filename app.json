@@ -20,7 +20,8 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to location to track your snowboarding sessions.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to location to track your snowboarding sessions in the background."
-      }
+      },
+      "bundleIdentifier": "com.zliu5864.snowboard-tracker-app"
     },
     "android": {
       "adaptiveIcon": {
@@ -29,7 +30,9 @@
       },
       "permissions": [
         "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION"
+        "ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ]
     },
     "web": {
